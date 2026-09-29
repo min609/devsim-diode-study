@@ -1,0 +1,22 @@
+# ===== 虚拟环境（751 MB，绝不能提交）=====
+.venv/
+venv/
+env/
+
+# ===== Python 缓存 =====
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# ===== 运行日志（每次跑都会变，不必存档）=====
+*.log
+
+# ===== DEVSIM 官方示例产生的中间文件 =====
+ref/diode_1d.dat
+
+# ===== 编辑器 / 系统 =====
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini
