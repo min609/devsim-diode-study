@@ -15,22 +15,34 @@ echo.
 echo ------------------------------------------------------------
 echo [2/5] 先从 GitHub 拉取最新内容（防止本地落后）
 git pull
-if errorlevel 1 echo.      警告：拉取失败（可能是网络问题或需要授权）
+if errorlevel 1 echo.      警告：拉取失败（网络问题或需要授权）
 echo.
 echo ------------------------------------------------------------
 set "msg="
-set /p "msg=[3/5] 请输入这次改了什么（直接回车取消）: "
-if "%msg%"=="" goto :cancelled
+set /p "msg=[3/5] 请输入这次改了什么（直接回车=自动生成说明）: "
 echo.
-echo [4/5] 提交中...
+echo [4/5] 检查需要提交的改动...
 git add -A
 git diff --cached --quiet
-if not errorlevel 1 goto :nothing
+if not errorlevel 1 goto :skipcommit
+if "%msg%"=="" set "msg=自动提交"
 git commit -m "%msg%"
 if errorlevel 1 goto :commitfail
+goto :dopush
+
+:skipcommit
+echo       没有新的改动需要提交（可能上次已经提交过了）
+echo       继续检查是否有提交需要推送...
 echo.
+
+:dopush
 echo ------------------------------------------------------------
 echo [5/5] 推送到 GitHub...
+echo.
+echo       如果提示输入账号密码，请这样填：
+echo         Username  -^>  min609
+echo         Password  -^>  粘贴 token（屏幕不显示任何字符，是正常的）
+echo.
 git push
 if errorlevel 1 goto :pushfail
 echo.
@@ -38,16 +50,6 @@ echo ============================================================
 echo   全部完成！改动已经在 GitHub 上：
 echo   https://github.com/min609/devsim-diode-study
 echo ============================================================
-goto :end
-
-:cancelled
-echo.
-echo   你按了回车，已取消，什么都没做。
-goto :end
-
-:nothing
-echo.
-echo   没有检测到任何改动，不需要提交。
 goto :end
 
 :commitfail
@@ -59,8 +61,10 @@ goto :end
 echo.
 echo ============================================================
 echo   推送失败！常见原因：
-echo     1. 需要重新授权（之前那个 token 已删除）
-echo        解决：新建 token 后运行 git push，按提示输入
+echo     1. token 无效或输错了
+echo        确认用的是【最新】创建的那个 token
+echo        若需重来，先删除已存凭据:
+echo            cmdkey /delete:git:https://github.com
 echo     2. 网络问题（检查 Nano 是否开着，它会劫持代理）
 echo     3. 本地落后远程（先运行 git pull）
 echo ============================================================
